@@ -82,7 +82,10 @@ module WickedPdfHelper
     end
 
     def precompiled_asset?(source)
-      Rails.configuration.assets.compile == false || source.to_s[0] == '/'
+      precompiled = Rails.configuration.assets.compile == false
+      precompiled ||= source.to_s.starts_with?('/')
+      precompiled ||= source.to_s.starts_with?('../')
+      precompiled
     end
 
     def read_asset(source)
@@ -112,7 +115,7 @@ module WickedPdfHelper
     end
 
     def asset_exists?(source)
-      Rails.application.assets.find_asset(source).present?
+      precompiled_asset?(source) || Rails.application.assets.find_asset(source).present?
     end
   end
 end
